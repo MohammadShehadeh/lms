@@ -19,6 +19,10 @@
     "./env": {
       "types": "./dist/env.d.ts",
       "default": "./env.ts"
+    },
+    "./utils": {
+      "types": "./dist/src/utils.d.ts",
+      "default": "./src/utils.ts"
     }
   },
   "license": "MIT",
@@ -38,7 +42,9 @@
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
+    "@nucleus/validators": "workspace:*",
     "@t3-oss/env-core": "catalog:",
+    "date-fns": "^4.1.0",
     "drizzle-orm": "^0.45.1",
     "drizzle-zod": "^0.8.3",
     "postgres": "^3.4.8",

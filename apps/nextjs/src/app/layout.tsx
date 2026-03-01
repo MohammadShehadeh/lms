@@ -3,6 +3,7 @@ import "./globals.css";
 import { ThemeProvider } from "@nucleus/ui/components/theme";
 import { Toaster } from "@nucleus/ui/components/toast";
 import { cn } from "@nucleus/ui/lib/utils";
+import { NuqsAdapter } from "@nucleus/ui/providers/nuqs";
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { env } from "@/env";
@@ -56,11 +57,13 @@ export default function RootLayout(props: { children: React.ReactNode }) {
         )}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <TRPCReactProvider>
-            <HydrateClient>
-              <div className="flex min-h-screen flex-col">{props.children}</div>
-            </HydrateClient>
-          </TRPCReactProvider>
+          <NuqsAdapter>
+            <TRPCReactProvider>
+              <HydrateClient>
+                <div className="flex min-h-screen flex-col">{props.children}</div>
+              </HydrateClient>
+            </TRPCReactProvider>
+          </NuqsAdapter>
           <Toaster />
         </ThemeProvider>
       </body>

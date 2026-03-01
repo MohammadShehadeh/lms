@@ -53,7 +53,7 @@
         "useTemplate": "error"
       },
       "suspicious": {
-        "noConsole": "warn",
+        "noConsole": "off",
         "noExplicitAny": "warn"
       },
       "complexity": {
@@ -92,34 +92,13 @@
   },
   "overrides": [
     {
-      "includes": ["apps/nextjs/**/*"],
-      "linter": {
-        "rules": {
-          "suspicious": {
-            "noConsole": "off"
-          }
-        }
-      }
+      "includes": ["apps/nextjs/**/*"]
     },
     {
-      "includes": ["apps/expo/**/*"],
-      "linter": {
-        "rules": {
-          "suspicious": {
-            "noConsole": "off"
-          }
-        }
-      }
+      "includes": ["apps/expo/**/*"]
     },
     {
-      "includes": ["**/*.config.*", "**/config/**/*"],
-      "linter": {
-        "rules": {
-          "suspicious": {
-            "noConsole": "off"
-          }
-        }
-      }
+      "includes": ["**/*.config.*", "**/config/**/*"]
     },
     {
       "includes": ["packages/ui/**/*.css"],

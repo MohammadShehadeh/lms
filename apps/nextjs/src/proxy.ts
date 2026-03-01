@@ -1,9 +1,9 @@
 import { Redis } from "@nucleus/cache";
 import { RedisRateLimiter } from "@nucleus/rate-limit";
-import { getSessionCookie } from "better-auth/cookies";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { authRoutes, protectedRoutes } from "@/constants/routes";
+import { getSession } from "./auth/server";
 
 const rateLimiter = new RedisRateLimiter(Redis.getInstance(), {
   limit: 1000,
@@ -19,9 +19,7 @@ export async function proxy(request: NextRequest) {
     return new NextResponse("Rate limit exceeded", { status: 429 });
   }
 
-  // This middleware provides optimistic redirects
-  // Full authentication checks are performed within each page/route handler
-  const cookies = getSessionCookie(request);
+  const session = await getSession();
 
   // Check if the requested URL matches any protected route patterns
   const isProtectedRoute = () => {
@@ -34,7 +32,7 @@ export async function proxy(request: NextRequest) {
   };
 
   // Handle route protection and redirects
-  if ((isProtectedRoute() && !cookies) || (isAuthRoute() && cookies)) {
+  if ((isProtectedRoute() && !session) || (isAuthRoute() && session)) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
