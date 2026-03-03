@@ -56,7 +56,13 @@ export default function RootLayout(props: { children: React.ReactNode }) {
           geistMono.variable
         )}
       >
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          disableTransitionOnChange
+          enableColorScheme
+          enableSystem
+        >
           <NuqsAdapter>
             <TRPCReactProvider>
               <HydrateClient>

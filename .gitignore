@@ -50,3 +50,6 @@ dist/
 
 # turbo
 .turbo
+
+# claude
+settings.local.json
