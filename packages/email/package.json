@@ -23,11 +23,11 @@
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
   },
   "dependencies": {
-    "@react-email/components": "1.0.8",
+    "@react-email/components": "1.0.12",
     "@t3-oss/env-core": "catalog:",
     "react": "catalog:react19",
     "react-dom": "catalog:react19",
-    "resend": "^6.9.3",
+    "resend": "^6.10.0",
     "zod": "catalog:"
   },
   "devDependencies": {

@@ -64,10 +64,10 @@ function PopoverDescription({ className, ...props }: React.ComponentProps<"p">) 
 
 export {
   Popover,
-  PopoverTrigger,
-  PopoverContent,
   PopoverAnchor,
+  PopoverContent,
+  PopoverDescription,
   PopoverHeader,
   PopoverTitle,
-  PopoverDescription,
+  PopoverTrigger,
 };

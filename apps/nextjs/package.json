@@ -28,7 +28,7 @@
     "@trpc/client": "catalog:",
     "@trpc/server": "catalog:",
     "@trpc/tanstack-react-query": "catalog:",
-    "motion": "^12.34.3",
+    "motion": "^12.38.0",
     "next": "catalog:",
     "react": "catalog:react19",
     "react-dom": "catalog:react19",
@@ -38,7 +38,7 @@
   "devDependencies": {
     "@nucleus/tailwind-config": "workspace:*",
     "@nucleus/tsconfig": "workspace:*",
-    "@types/node": "^25.3.2",
+    "@types/node": "^25.6.0",
     "@types/react": "catalog:react19",
     "@types/react-dom": "catalog:react19",
     "dotenv-cli": "^11.0.0",

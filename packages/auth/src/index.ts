@@ -18,7 +18,7 @@ interface InitAuthOptions {
   };
 }
 
-export function initAuth(options: InitAuthOptions): ReturnType<typeof betterAuth> {
+export function initAuth(options: InitAuthOptions) {
   const config = {
     appName: "Nucleus",
     rateLimit: {
