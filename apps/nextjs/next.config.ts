@@ -1,12 +1,7 @@
-import { createJiti } from "jiti";
+import "./src/env";
+import type { NextConfig } from "next";
 
-const jiti = createJiti(import.meta.url);
-
-// Import env files to validate at build time. Use jiti so we can load .ts files in here.
-await jiti.import("./src/env");
-
-/** @type {import("next").NextConfig} */
-const config = {
+const nextConfig: NextConfig = {
   /** Enables hot reloading for local packages without a build step */
   transpilePackages: [
     "@nucleus/api",
@@ -14,6 +9,8 @@ const config = {
     "@nucleus/db",
     "@nucleus/ui",
     "@nucleus/validators",
+    "@t3-oss/env-nextjs",
+    "@t3-oss/env-core",
   ],
 
   // images
@@ -28,4 +25,4 @@ const config = {
   output: "standalone",
 };
 
-export default config;
+export default nextConfig;
