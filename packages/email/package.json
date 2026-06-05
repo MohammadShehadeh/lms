@@ -27,7 +27,7 @@
     "@t3-oss/env-core": "catalog:",
     "react": "catalog:react19",
     "react-dom": "catalog:react19",
-    "resend": "^6.10.0",
+    "resend": "^6.12.4",
     "zod": "catalog:"
   },
   "devDependencies": {

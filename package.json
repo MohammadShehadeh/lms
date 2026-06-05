@@ -26,11 +26,11 @@
     "prepare": "husky"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.11",
-    "@turbo/gen": "^2.9.6",
+    "@biomejs/biome": "2.4.16",
+    "@turbo/gen": "^2.9.16",
     "husky": "^9.1.7",
-    "lint-staged": "^16.4.0",
-    "turbo": "^2.9.6",
+    "lint-staged": "^17.0.7",
+    "turbo": "^2.9.16",
     "typescript": "catalog:"
   }
 }

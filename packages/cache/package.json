@@ -27,6 +27,6 @@
     "typescript": "catalog:"
   },
   "dependencies": {
-    "redis": "^5.11.0"
+    "redis": "^6.0.0"
   }
 }
