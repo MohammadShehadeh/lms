@@ -6,6 +6,7 @@ import { Checkbox } from "@nucleus/ui/components/checkbox";
 import { DataTableColumnHeader } from "@nucleus/ui/components/data-table/data-table-column-header";
 import { formatDate } from "@nucleus/ui/lib/format";
 import type { ColumnDef } from "@tanstack/react-table";
+import { UserRowActions } from "../_components/user-row-actions";
 
 type User = RouterOutputs["users"]["list"]["data"][number];
 
@@ -76,10 +77,30 @@ export function getColumns(): ColumnDef<User>[] {
       },
     },
     {
+      accessorKey: "roleName",
+      header: ({ column }) => <DataTableColumnHeader column={column} label="Role" />,
+      cell: ({ row }) => {
+        const roleName = row.getValue<string | null>("roleName");
+        return roleName ? (
+          <Badge variant="outline">{roleName}</Badge>
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        );
+      },
+      enableSorting: false,
+    },
+    {
       accessorKey: "createdAt",
       header: ({ column }) => <DataTableColumnHeader column={column} label="Created" />,
       cell: ({ row }) => formatDate(row.getValue<Date>("createdAt")),
       enableSorting: true,
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => <UserRowActions user={row.original} />,
+      enableSorting: false,
+      enableHiding: false,
+      size: 40,
     },
   ];
 }

@@ -1,9 +1,10 @@
-import { user, userInsertSchema, userSelectSchema } from "@nucleus/db/schema";
+import { SUPER_ADMIN_SLUG } from "@nucleus/db/rbac";
+import { role, user, userInsertSchema, userSelectSchema } from "@nucleus/db/schema";
 import { takeFirstOrNull } from "@nucleus/db/utils";
-import type { TRPCRouterRecord } from "@trpc/server";
+import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
 import { and, asc, count, desc, eq, ilike, inArray } from "drizzle-orm";
 import { z } from "zod/v4";
-import { protectedProcedure } from "../trpc";
+import { requirePermission } from "../trpc";
 
 const sortSchema = z.array(
   z.object({
@@ -20,13 +21,29 @@ const sortableColumns = {
 } as const;
 
 export const usersRouter = {
-  getById: protectedProcedure
+  getById: requirePermission("user:read")
     .input(userSelectSchema.pick({ id: true }))
     .query(async ({ ctx, input }) => {
-      return takeFirstOrNull(await ctx.db.select().from(user).where(eq(user.id, input.id)));
+      return takeFirstOrNull(
+        await ctx.db
+          .select({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            emailVerified: user.emailVerified,
+            image: user.image,
+            roleId: user.roleId,
+            roleName: role.name,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
+          })
+          .from(user)
+          .leftJoin(role, eq(user.roleId, role.id))
+          .where(eq(user.id, input.id))
+      );
     }),
 
-  list: protectedProcedure
+  list: requirePermission("user:list")
     .input(
       z.object({
         page: z.number().min(1).default(1),
@@ -64,8 +81,19 @@ export const usersRouter = {
 
       const [data, total] = await Promise.all([
         ctx.db
-          .select()
+          .select({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+            emailVerified: user.emailVerified,
+            image: user.image,
+            roleId: user.roleId,
+            roleName: role.name,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
+          })
           .from(user)
+          .leftJoin(role, eq(user.roleId, role.id))
           .where(where)
           .orderBy(...orderBy)
           .limit(perPage)
@@ -79,7 +107,7 @@ export const usersRouter = {
       };
     }),
 
-  update: protectedProcedure
+  update: requirePermission("user:update")
     .input(userInsertSchema.pick({ id: true, email: true, name: true }))
     .mutation(async ({ ctx, input }) => {
       return takeFirstOrNull(
@@ -88,6 +116,37 @@ export const usersRouter = {
           .set({ email: input.email, name: input.name })
           .where(eq(user.id, input.id))
           .returning()
+      );
+    }),
+
+  setRole: requirePermission("user:assign-role")
+    .input(z.object({ userId: z.string(), roleId: z.string().nullable() }))
+    .mutation(async ({ ctx, input }) => {
+      if (input.roleId) {
+        const target = takeFirstOrNull(
+          await ctx.db
+            .select({ id: role.id, slug: role.slug })
+            .from(role)
+            .where(eq(role.id, input.roleId))
+        );
+        if (!target) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Role not found." });
+        }
+        // The wildcard super admin role can only be granted via the seed/bootstrap.
+        if (target.slug === SUPER_ADMIN_SLUG) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "The super admin role cannot be assigned.",
+          });
+        }
+      }
+
+      return takeFirstOrNull(
+        await ctx.db
+          .update(user)
+          .set({ roleId: input.roleId })
+          .where(eq(user.id, input.userId))
+          .returning({ id: user.id, roleId: user.roleId })
       );
     }),
 } satisfies TRPCRouterRecord;

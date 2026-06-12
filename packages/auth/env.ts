@@ -9,6 +9,8 @@ export function authEnv() {
       NODE_ENV: z.enum(["development", "production"]).optional(),
       GOOGLE_CLIENT_ID: z.string().min(1),
       GOOGLE_CLIENT_SECRET: z.string().min(1),
+      // Comma-separated emails granted the super_admin role on signup / via seed.
+      SUPER_ADMIN_EMAILS: z.string().optional(),
     },
     runtimeEnv: process.env,
     skipValidation: !!process.env.CI || process.env.npm_lifecycle_event === "lint",

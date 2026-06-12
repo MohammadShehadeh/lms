@@ -64,7 +64,7 @@ import { initAuth } from "@nucleus/auth";
 
 export const auth = initAuth({
   baseUrl: getBaseUrl(),
-  productionUrl: `https://${env.VERCEL_PROJECT_PRODUCTION_URL}`,
+  productionUrl: `https://${env.NEXT_PUBLIC_BASE_URL}`,
   secret: env.AUTH_SECRET,
   socialProviders: {
     google: {

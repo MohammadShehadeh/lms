@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "@better-auth/expo": "catalog:",
+    "@nucleus/cache": "workspace:*",
     "@nucleus/db": "workspace:*",
     "@nucleus/email": "workspace:*",
     "@t3-oss/env-core": "catalog:",

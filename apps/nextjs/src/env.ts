@@ -10,7 +10,6 @@ export const env = createEnv({
   extends: [authEnv(), vercel(), dbEnv(), cacheEnv(), emailEnv()],
   shared: {
     NODE_ENV: z.enum(["development", "production", "test"]).default("development").optional(),
-    PORT: z.coerce.number().default(3000).optional(),
   },
 
   /**
@@ -34,7 +33,6 @@ export const env = createEnv({
    */
   experimental__runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
-    PORT: process.env.PORT,
     NEXT_PUBLIC_BASE_URL: process.env.NEXT_PUBLIC_BASE_URL,
   },
   skipValidation: !!process.env.CI || process.env.npm_lifecycle_event === "lint",

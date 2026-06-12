@@ -11,9 +11,7 @@ import { TRPCReactProvider } from "@/trpc/react";
 import { HydrateClient } from "@/trpc/server";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    env.VERCEL_ENV === "production" ? env.NEXT_PUBLIC_BASE_URL : "http://localhost:3000"
-  ),
+  metadataBase: new URL(env.NEXT_PUBLIC_BASE_URL),
   title: "Nucleus",
   description: "A Real-World Full-Stack Reference Architecture",
   openGraph: {

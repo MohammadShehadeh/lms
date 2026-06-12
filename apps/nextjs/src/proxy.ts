@@ -1,8 +1,9 @@
 import { Redis } from "@nucleus/cache";
+import { hasPermission } from "@nucleus/db/rbac";
 import { RedisRateLimiter } from "@nucleus/rate-limit";
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { authRoutes, protectedRoutes } from "@/constants/routes";
+import { authRoutes, protectedRoutes, routePermissions } from "@/constants/routes";
 import { getSession } from "./auth/server";
 
 const rateLimiter = new RedisRateLimiter(Redis.getInstance(), {
@@ -14,6 +15,7 @@ export async function proxy(request: NextRequest) {
   const xffHeader = request.headers.get("x-forwarded-for");
   const clientIp = xffHeader?.split(",")[0] ?? "anonymous";
   const { allowed } = await rateLimiter.check(clientIp);
+  const pathname = request.nextUrl.pathname;
 
   if (!allowed) {
     return new NextResponse("Rate limit exceeded", { status: 429 });
@@ -23,17 +25,26 @@ export async function proxy(request: NextRequest) {
 
   // Check if the requested URL matches any protected route patterns
   const isProtectedRoute = () => {
-    return protectedRoutes.some((path) => request.nextUrl.pathname.startsWith(path));
+    return protectedRoutes.some((path) => pathname.startsWith(path));
   };
 
   // Check if the requested URL matches any authentication route patterns
   const isAuthRoute = () => {
-    return authRoutes.some((path) => request.nextUrl.pathname.startsWith(path));
+    return authRoutes.some((path) => pathname.startsWith(path));
   };
 
   // Handle route protection and redirects
   if ((isProtectedRoute() && !session) || (isAuthRoute() && session)) {
     return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  // Permission-based route guard: an authenticated user without the required
+  // permission is sent back to the dashboard.
+  if (session) {
+    const guarded = routePermissions.find((route) => pathname.startsWith(route.prefix));
+    if (guarded && !hasPermission(session.user.permissions ?? [], guarded.permission)) {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
   }
 
   return NextResponse.next();

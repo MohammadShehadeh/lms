@@ -1,5 +1,6 @@
 import { pgTable } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import { role } from "./rbac";
 
 export const user = pgTable("user", (t) => ({
   id: t.text().primaryKey(),
@@ -7,6 +8,7 @@ export const user = pgTable("user", (t) => ({
   email: t.text().notNull().unique(),
   emailVerified: t.boolean().notNull(),
   image: t.text(),
+  roleId: t.text().references(() => role.id, { onDelete: "set null" }),
   createdAt: t.timestamp().notNull().defaultNow(),
   updatedAt: t.timestamp({ mode: "date", withTimezone: true }).$onUpdateFn(() => new Date()),
 }));
