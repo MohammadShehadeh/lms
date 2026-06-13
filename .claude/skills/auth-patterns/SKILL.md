@@ -251,7 +251,7 @@ try {
     password: data.password,
   });
 } catch (error) {
-  if (error instanceof Error) {
+  if (Error.isError(error)) {
     // Handle specific auth errors
     if (error.message.includes("Invalid credentials")) {
       setError("Invalid email or password");

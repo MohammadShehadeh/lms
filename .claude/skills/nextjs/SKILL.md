@@ -1521,7 +1521,7 @@ try {
 try {
   throw new CustomError('Test error');
 } catch (error) {
-  if (error instanceof Error && error.name === 'CustomError') { // ✅ true
+  if (Error.isError(error) && error.name === 'CustomError') { // ✅ true
     // Handle CustomError
   }
 }

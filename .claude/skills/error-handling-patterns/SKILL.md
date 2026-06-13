@@ -50,7 +50,7 @@ export const userRouter = {
         return result[0];
       } catch (error) {
         // Example of catching a specific database constraint error
-        if (error instanceof Error && error.message.includes('duplicate key')) {
+        if (Error.isError(error) && error.message.includes('duplicate key')) {
           throw new TRPCError({
             code: "CONFLICT",
             message: "A user with this email already exists",
@@ -173,7 +173,7 @@ export async function updateUser(id: string, data: Partial<User>) {
 
     return result[0];
   } catch (error) {
-    if (error instanceof Error) {
+    if (Error.isError(error)) {
       // Handle specific database errors
       if (error.message.includes('foreign key constraint')) {
         throw new Error('Cannot update user: referenced by other records');
@@ -208,7 +208,7 @@ export function LoginForm() {
         callbackURL: "/dashboard",
       });
     } catch (error) {
-      if (error instanceof Error) {
+      if (Error.isError(error)) {
         // Handle specific auth errors
         if (error.message.includes("Invalid credentials")) {
           setError("Invalid email or password");

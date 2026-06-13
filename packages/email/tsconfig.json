@@ -1,7 +1,7 @@
 {
   "extends": "@nucleus/tsconfig/internal-package.json",
   "compilerOptions": {
-    "lib": ["ES2022"],
+    "lib": ["ESNext"],
     "jsx": "preserve",
     "plugins": [
       {
