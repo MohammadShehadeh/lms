@@ -64,7 +64,7 @@ import { initAuth } from "@nucleus/auth";
 
 export const auth = initAuth({
   baseUrl: getBaseUrl(),
-  productionUrl: `https://${env.VERCEL_PROJECT_PRODUCTION_URL}`,
+  productionUrl: `https://${env.NEXT_PUBLIC_BASE_URL}`,
   secret: env.AUTH_SECRET,
   socialProviders: {
     google: {
@@ -251,7 +251,7 @@ try {
     password: data.password,
   });
 } catch (error) {
-  if (error instanceof Error) {
+  if (Error.isError(error)) {
     // Handle specific auth errors
     if (error.message.includes("Invalid credentials")) {
       setError("Invalid email or password");

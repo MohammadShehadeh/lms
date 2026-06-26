@@ -1,10 +1,15 @@
 import { relations } from "drizzle-orm";
 
+import { role } from "../rbac";
 import { account, session, user, verification } from "../user";
 
-export const userRelations = relations(user, ({ many }) => ({
+export const userRelations = relations(user, ({ one, many }) => ({
   sessions: many(session),
   accounts: many(account),
+  role: one(role, {
+    fields: [user.roleId],
+    references: [role.id],
+  }),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({

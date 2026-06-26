@@ -37,6 +37,10 @@ export class RedisRateLimiter {
     const redisKey = `rate_limit:${key}`;
 
     try {
+      // Anonymous/cold traffic never goes through the cache path, so nothing
+      // else opens the connection — establish it here (fail-open if Redis is down).
+      await this.redis.connect().catch(() => undefined);
+
       const pipeline = await this.redis.multi();
       if (!pipeline) {
         console.warn("Failed to create pipeline");
@@ -100,6 +104,8 @@ export class RedisRateLimiter {
     const redisKey = `rate_limit:${key}`;
 
     try {
+      await this.redis.connect().catch(() => undefined);
+
       // Use pipeline for atomic operations
       const pipeline = await this.redis.multi();
       if (!pipeline) {

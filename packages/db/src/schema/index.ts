@@ -1,5 +1,4 @@
-// relations
+export * from "./rbac";
+export * from "./relations/rbac";
 export * from "./relations/user";
-
-// tables
 export * from "./user";

@@ -9,6 +9,7 @@
 
 import type { Auth } from "@nucleus/auth";
 import { db } from "@nucleus/db/client";
+import { hasAllPermissions, type PermissionKey } from "@nucleus/db/rbac";
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError, z } from "zod/v4";
@@ -129,3 +130,40 @@ export const protectedProcedure = t.procedure.use(timingMiddleware).use(({ ctx, 
     },
   });
 });
+
+/**
+ * Permission-protected procedure factory.
+ *
+ * Builds on `protectedProcedure` and additionally requires the session user's
+ * effective permissions (injected by the `customSession` plugin) to satisfy
+ * ALL of the given permission keys. The seeded super admin (wildcard `*`) always
+ * passes. Throws FORBIDDEN otherwise.
+ *
+ * @example
+ * create: requirePermission("role:create").input(...).mutation(...)
+ */
+export const requirePermission = (...required: [PermissionKey, ...PermissionKey[]]) =>
+  protectedProcedure.use(({ ctx, next }) => {
+    const granted = ctx.session.user.permissions ?? [];
+    if (!hasAllPermissions(granted, required)) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "You do not have permission to perform this action.",
+      });
+    }
+    return next();
+  });
+
+/**
+ * Prevents privilege escalation: a caller may only grant permissions they
+ * themselves hold. The super admin (wildcard) passes for any set. Shared by the
+ * role editor (`roles.create`/`update`) and role assignment (`users.setRole`).
+ */
+export function assertCanGrant(granted: readonly string[], requested: readonly string[]) {
+  if (!hasAllPermissions(granted, requested as readonly PermissionKey[])) {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "You can only grant permissions you hold yourself.",
+    });
+  }
+}

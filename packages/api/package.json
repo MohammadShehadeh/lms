@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@nucleus/auth": "workspace:*",
+    "@nucleus/cache": "workspace:*",
     "@nucleus/db": "workspace:*",
     "@nucleus/validators": "workspace:*",
     "@trpc/server": "catalog:",

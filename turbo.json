@@ -10,7 +10,6 @@
       "outputs": [".cache/tsbuildinfo.json", "dist/**", ".next/**", "!.next/cache/**"]
     },
     "dev": {
-      "dependsOn": ["^dev"],
       "cache": false,
       "persistent": true
     },
@@ -22,6 +21,10 @@
       "dependsOn": ["^topo", "^build"],
       "outputs": [".cache/tsbuildinfo.json"]
     },
+    "test": {
+      "dependsOn": ["^topo", "^build"],
+      "outputs": []
+    },
     "clean": {
       "cache": false
     },
@@ -29,6 +32,10 @@
       "cache": false
     },
     "push": {
+      "cache": false,
+      "interactive": true
+    },
+    "seed": {
       "cache": false,
       "interactive": true
     },
@@ -45,12 +52,12 @@
     "POSTGRES_URL",
     "AUTH_REDIRECT_PROXY_URL",
     "AUTH_SECRET",
-    "PORT",
     "RESEND_FROM",
     "RESEND_TOKEN",
     "REDIS_CONNECTION_STRING",
     "GOOGLE_CLIENT_ID",
-    "GOOGLE_CLIENT_SECRET"
+    "GOOGLE_CLIENT_SECRET",
+    "SUPER_ADMIN_EMAILS"
   ],
   "globalPassThroughEnv": [
     "NODE_ENV",
