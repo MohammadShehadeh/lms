@@ -2,17 +2,8 @@
 
 import type { RouterOutputs } from "@nucleus/api";
 import { SUPER_ADMIN_SLUG } from "@nucleus/db/rbac";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@nucleus/ui/components/alert-dialog";
 import { Button } from "@nucleus/ui/components/button";
+import { useConfirm } from "@nucleus/ui/components/confrim";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,10 +25,10 @@ type Role = RouterOutputs["roles"]["list"]["data"][number];
 export function RoleRowActions({ role }: { role: Role }) {
   const trpc = useTRPC();
   const router = useRouter();
+  const confirm = useConfirm();
   const { can } = usePermissions();
 
   const [editOpen, setEditOpen] = useState(false);
-  const [deleteOpen, setDeleteOpen] = useState(false);
 
   // The table renders from RSC props, so refresh the server component to reflect changes.
   const refresh = () => router.refresh();
@@ -47,11 +38,23 @@ export function RoleRowActions({ role }: { role: Role }) {
       onSuccess: () => {
         refresh();
         toast.success("Role deleted");
-        setDeleteOpen(false);
       },
       onError: (error) => toast.error(error.message),
     })
   );
+
+  const confirmDelete = () =>
+    confirm({
+      title: `Delete “${role.name}”?`,
+      description: "Users with this role will have it removed. This action cannot be undone.",
+      confirmText: "Delete",
+      tone: "destructive",
+      onConfirm: async () => {
+        // Error toast is handled by the mutation's onError; swallow so the
+        // dialog closes instead of the confirm helper rethrowing.
+        await deleteMutation.mutateAsync({ id: role.id }).catch(() => {});
+      },
+    });
 
   const setDefaultMutation = useMutation(
     trpc.roles.setDefault.mutationOptions({
@@ -91,7 +94,7 @@ export function RoleRowActions({ role }: { role: Role }) {
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="text-destructive focus:text-destructive"
-                onClick={() => setDeleteOpen(true)}
+                onClick={confirmDelete}
               >
                 Delete
               </DropdownMenuItem>
@@ -101,23 +104,6 @@ export function RoleRowActions({ role }: { role: Role }) {
       </DropdownMenu>
 
       <RoleFormDialog open={editOpen} onOpenChange={setEditOpen} role={role} onSaved={refresh} />
-
-      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete “{role.name}”?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Users with this role will have it removed. This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => deleteMutation.mutate({ id: role.id })}>
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   );
 }

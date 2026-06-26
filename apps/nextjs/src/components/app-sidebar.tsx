@@ -150,7 +150,7 @@ export function AppSidebar({ user, ...props }: AppSidebarProps) {
             ))}
           </SidebarMenu>
         </SidebarGroup>
-        <SidebarGroup {...props}>
+        <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
               {navSecondary.map((item) => (

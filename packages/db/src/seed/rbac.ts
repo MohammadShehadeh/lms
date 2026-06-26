@@ -1,19 +1,12 @@
 import { inArray } from "drizzle-orm";
-import { db } from "./client";
+import { db } from "../client";
 import {
   DEFAULT_ROLE_SLUG,
   type PermissionKey,
   SUPER_ADMIN_SLUG,
   WILDCARD_PERMISSION,
-} from "./rbac";
-import { role, user } from "./schema";
-
-/**
- * Seeds the built-in RBAC roles and (optionally) promotes the users listed in
- * SUPER_ADMIN_EMAILS to super admin. Idempotent — safe to run repeatedly.
- *
- * Run with: `pnpm -F @nucleus/db seed`
- */
+} from "../rbac";
+import { role, user } from "../schema";
 
 /**
  * Permissions granted to every new user via the default role. Members get
@@ -21,7 +14,7 @@ import { role, user } from "./schema";
  */
 const MEMBER_PERMISSIONS: PermissionKey[] = [];
 
-async function seed() {
+export async function seedRbac() {
   // 1. Super admin — wildcard access, never the signup default.
   const [superAdmin] = await db
     .insert(role)
@@ -52,7 +45,7 @@ async function seed() {
     })
     .onConflictDoUpdate({
       target: role.slug,
-      set: { isSystem: true, isDefault: true },
+      set: { permissions: MEMBER_PERMISSIONS, isSystem: true },
     });
 
   console.info("✓ Seeded system roles: super_admin, member");
@@ -77,10 +70,3 @@ async function seed() {
     );
   }
 }
-
-seed()
-  .then(() => process.exit(0))
-  .catch((error) => {
-    console.error("RBAC seed failed:", error);
-    process.exit(1);
-  });

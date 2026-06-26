@@ -1,5 +1,5 @@
 import "./globals.css";
-
+import { ConfirmProvider } from "@nucleus/ui/components/confrim";
 import { ThemeProvider } from "@nucleus/ui/components/theme";
 import { Toaster } from "@nucleus/ui/components/toast";
 import { cn } from "@nucleus/ui/lib/utils";
@@ -64,7 +64,9 @@ export default function RootLayout(props: { children: React.ReactNode }) {
           <NuqsAdapter>
             <TRPCReactProvider>
               <HydrateClient>
-                <div className="flex min-h-screen flex-col">{props.children}</div>
+                <ConfirmProvider>
+                  <div className="flex min-h-screen flex-col">{props.children}</div>
+                </ConfirmProvider>
               </HydrateClient>
             </TRPCReactProvider>
           </NuqsAdapter>

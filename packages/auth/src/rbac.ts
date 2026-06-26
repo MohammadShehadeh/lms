@@ -42,8 +42,8 @@ async function loadRoleRbac(roleId: string): Promise<UserRbac> {
 /**
  * Loads a user's role + effective permissions for session enrichment, keyed by
  * `roleId` (passed from better-auth's user object via the `roleId` additional
- * field, so no extra user query is needed). Cached in Redis and shared across
- * all users with the same role; `wrapWithCache` collapses concurrent misses.
+ * field, so no extra user query is needed). Cached in Redis (TTL ~10min) and
+ * shared across all users with the same role.
  */
 export async function loadUserRbac(roleId: string | null): Promise<UserRbac> {
   if (!roleId) return EMPTY_RBAC;
@@ -86,7 +86,9 @@ export async function assignSignupRole(
   superAdminEmails: string[]
 ): Promise<void> {
   const roleId = await resolveSignupRoleId(email, superAdminEmails);
+
   if (roleId) {
+    // @TODO: This is a temporary assignment as platform is still in development
     await db.update(user).set({ roleId }).where(eq(user.id, userId));
   }
 }

@@ -41,7 +41,7 @@
     "drop": "pnpm with-env drizzle-kit drop",
     "migrate": "pnpm with-env drizzle-kit migrate",
     "generate": "pnpm with-env drizzle-kit generate",
-    "seed": "pnpm with-env tsx src/seed-rbac.ts",
+    "seed": "pnpm with-env tsx src/seed/index.ts",
     "studio": "pnpm with-env drizzle-kit studio",
     "test": "vitest run",
     "test:watch": "vitest",

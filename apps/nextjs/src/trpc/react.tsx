@@ -33,7 +33,8 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
       links: [
         loggerLink({
           enabled: (op) =>
-            env.NODE_ENV === "development" || (op.direction === "down" && Error.isError(op.result)),
+            env.NODE_ENV === "development" ||
+            (op.direction === "down" && op.result instanceof Error),
         }),
         httpBatchStreamLink({
           transformer: SuperJSON,
@@ -59,5 +60,6 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
 
 const getBaseUrl = () => {
   if (typeof window !== "undefined") return window.location.origin;
-  return `https://${env.NEXT_PUBLIC_BASE_URL}`;
+  // NEXT_PUBLIC_BASE_URL is a full URL (z.url) — don't re-prefix the scheme.
+  return env.NEXT_PUBLIC_BASE_URL;
 };

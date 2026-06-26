@@ -1,30 +1,12 @@
 import { randomUUID } from "node:crypto";
 import { Redis } from "@nucleus/cache";
-import {
-  hasAllPermissions,
-  type PermissionKey,
-  roleCacheKey,
-  SUPER_ADMIN_SLUG,
-} from "@nucleus/db/rbac";
+import { roleCacheKey, SUPER_ADMIN_SLUG } from "@nucleus/db/rbac";
 import { permissionKeySchema, role } from "@nucleus/db/schema";
-import { takeFirstOrNull } from "@nucleus/db/utils";
+import { checkPostgresErrorCode, takeFirstOrNull } from "@nucleus/db/utils";
 import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
 import { and, asc, count, desc, eq, ilike, ne, or } from "drizzle-orm";
 import { z } from "zod/v4";
-import { requirePermission } from "../trpc";
-
-/**
- * Prevents privilege escalation: a caller may only grant permissions they
- * themselves hold. The super admin (wildcard) passes for any set.
- */
-function assertCanGrant(granted: readonly string[], requested: readonly PermissionKey[]) {
-  if (!hasAllPermissions(granted, requested)) {
-    throw new TRPCError({
-      code: "FORBIDDEN",
-      message: "You can only grant permissions you hold yourself.",
-    });
-  }
-}
+import { assertCanGrant, requirePermission } from "../trpc";
 
 /** Drops a role's cached permissions so the next session read reflects the change. */
 function invalidateRoleCache(roleId: string) {
@@ -144,17 +126,29 @@ export const rolesRouter = {
         });
       }
 
-      return takeFirstOrNull(
-        await ctx.db
-          .insert(role)
-          .values({
-            name: input.name,
-            slug,
-            description: input.description,
-            permissions: input.permissions,
-          })
-          .returning()
-      );
+      try {
+        return takeFirstOrNull(
+          await ctx.db
+            .insert(role)
+            .values({
+              name: input.name,
+              slug,
+              description: input.description,
+              permissions: input.permissions,
+            })
+            .returning()
+        );
+      } catch (error) {
+        // A concurrent create that passed the pre-check above still trips the
+        // unique index — surface it as CONFLICT rather than a raw 500.
+        if (checkPostgresErrorCode(error, "unique_violation")) {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "A role with a similar name already exists.",
+          });
+        }
+        throw error;
+      }
     }),
 
   update: requirePermission("role:update")

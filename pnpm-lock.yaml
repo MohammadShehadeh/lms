@@ -377,6 +377,9 @@ importers:
       redis:
         specifier: ^6.0.0
         version: 6.0.0(@opentelemetry/api@1.9.0)
+      superjson:
+        specifier: 2.2.6
+        version: 2.2.6
     devDependencies:
       '@nucleus/tsconfig':
         specifier: workspace:*

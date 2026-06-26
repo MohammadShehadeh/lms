@@ -4,7 +4,7 @@ import { takeFirstOrNull } from "@nucleus/db/utils";
 import { TRPCError, type TRPCRouterRecord } from "@trpc/server";
 import { and, asc, count, desc, eq, ilike, inArray } from "drizzle-orm";
 import { z } from "zod/v4";
-import { requirePermission } from "../trpc";
+import { assertCanGrant, requirePermission } from "../trpc";
 
 const sortSchema = z.array(
   z.object({
@@ -125,7 +125,7 @@ export const usersRouter = {
       if (input.roleId) {
         const target = takeFirstOrNull(
           await ctx.db
-            .select({ id: role.id, slug: role.slug })
+            .select({ id: role.id, slug: role.slug, permissions: role.permissions })
             .from(role)
             .where(eq(role.id, input.roleId))
         );
@@ -139,6 +139,8 @@ export const usersRouter = {
             message: "The super admin role cannot be assigned.",
           });
         }
+
+        assertCanGrant(ctx.session.user.permissions ?? [], target.permissions ?? []);
       }
 
       return takeFirstOrNull(

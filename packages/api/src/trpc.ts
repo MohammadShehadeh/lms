@@ -153,3 +153,17 @@ export const requirePermission = (...required: [PermissionKey, ...PermissionKey[
     }
     return next();
   });
+
+/**
+ * Prevents privilege escalation: a caller may only grant permissions they
+ * themselves hold. The super admin (wildcard) passes for any set. Shared by the
+ * role editor (`roles.create`/`update`) and role assignment (`users.setRole`).
+ */
+export function assertCanGrant(granted: readonly string[], requested: readonly string[]) {
+  if (!hasAllPermissions(granted, requested as readonly PermissionKey[])) {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "You can only grant permissions you hold yourself.",
+    });
+  }
+}
